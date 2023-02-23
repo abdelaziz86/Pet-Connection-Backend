@@ -9,6 +9,9 @@ const cookieParser = require("cookie-parser")
 router.use(express.json())
 router.use(cookieParser())
 
+const { createToken, validateToken } = require('../JWT/JWT'); 
+
+
 
 
 router.get('/show', (req, res, next) => {
@@ -45,6 +48,10 @@ router.post("/login", async (req, res) => {
                 error : "Wrong username and password combination"
             })
         } else {
+            const accessToken = createToken(user); 
+            res.cookie("access-token", accessToken, {
+                maxAge : 60*60*24*30*1000 
+            }) // cookie expires after 30 days
             res.json("USER LOGGINED"); 
 
         }
@@ -69,5 +76,9 @@ router.get("/all", (req, res, next) => {
     }
 })
 
+
+router.get("/profile", validateToken, (req, res) => {
+    res.json("profile");
+})
  
 module.exports = router; 
